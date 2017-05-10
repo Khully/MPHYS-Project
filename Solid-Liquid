@@ -1,0 +1,207 @@
+move = 3.928817604 
+o = 0.551663569
+
+x1 = -31-move+o
+y1 = -6.875430807
+z1 = -31-move+o
+
+x2 = -31-move/2+o
+y2 = -4.911022005
+z2 = -31-move+o
+
+x3 = -31-move/2+o
+y3 = -6.875430807
+z3 = -31-move/2+o
+
+x4 = -31-move+o
+y4 = -4.911022005
+z4 = -31-move/2+o
+
+f = open("Solid-Liquid.dat","w")
+count = 0
+for i in range(16):
+  x1 += move
+  y1 = -6.875430807
+  
+  x2 += move
+  y2 = -4.911022005
+  
+  x3 += move
+  y3 = -6.875430807
+  
+  x4 += move
+  y4 = -4.911022005
+  for j in range(2):
+    y1 += move
+    z1 = -31-move+o
+
+    y2 += move
+    z2 = -31-move+o
+    
+    y3 += move
+    z3 = -31-move/2+o
+    
+    y4 += move
+    z4 = -31-move/2+o
+    for k in range(16):
+      z1 += move
+      z2 += move
+      z3 += move
+      z4 += move
+      
+      count += 1
+      
+      outString = str(x1) + " " + str(y1)+ " " + str(z1) + "\n"
+      f.write("Plat"+" "+str(count)+"\n")
+      f.write(outString)
+      
+      outString = str(x2) + " " + str(y2)+ " " + str(z2) + "\n"
+      f.write("Plat"+" "+str(count+1)+"\n")
+      f.write(outString)     
+
+      outString = str(x3) + " " + str(y3)+ " " + str(z3) + "\n"
+      f.write("Plat"+" "+str(count+2)+"\n")
+      f.write(outString)     
+
+      outString = str(x4) + " " + str(y4)+ " " + str(z4) + "\n"
+      f.write("Plat"+" "+str(count+3)+"\n")
+      f.write(outString)
+      count += 3
+
+move = 5.025009925 
+o    = -31
+
+x1 = -move+o
+y1 = -move+o
+z1 = -move+o
+
+x2 = -move/2+o
+y2 = -move/2+o
+z2 = -move+o
+
+x3 = -move+o
+y3 = -move/2+o
+z3 = -move/2+o
+
+x4 = -move/2+o
+y4 = -move+o
+z4 = -move/2+o
+
+for i in range(13):
+  x1 += move
+  y1 = -move+o
+  
+  x2 += move
+  y2 = -move/2+o
+  
+  x3 += move
+  y3 = -move/2+o
+  
+  x4 += move
+  y4 = -move+o
+  for j in range(5):
+    y1 += move
+    z1 = -move+o
+    
+    y2 += move
+    z2 = -move+o
+    
+    y3 += move
+    z3 = -move/2+o
+    
+    y4 += move
+    z4 = -move/2+o
+    for k in range(13):
+      z1 += move
+      z2 += move
+      z3 += move
+      z4 += move
+      
+      count += 1
+      
+      outString = str(x1) + " " + str(y1)+ " " + str(z1) + "\n"
+      f.write("H2O"+" "+str(count)+"\n")
+      f.write(outString)
+      
+      outString = str(x2) + " " + str(y2)+ " " + str(z2) + "\n"
+      f.write("H2O"+" "+str(count+1)+"\n")
+      f.write(outString)     
+
+      outString = str(x3) + " " + str(y3)+ " " + str(z3) + "\n"
+      f.write("H2O"+" "+str(count+2)+"\n")
+      f.write(outString)     
+
+      outString = str(x4) + " " + str(y4)+ " " + str(z4) + "\n"
+      f.write("H2O"+" "+str(count+3)+"\n")
+      f.write(outString)
+      count += 3
+
+
+move = 5.025009925 
+o    = -31
+
+x1 = -move+o
+y1 = (move/2)-move
+z1 = -move+o
+
+x2 = -move/2+o
+y2 = -move/2++(move/2)
+z2 = -move+o
+
+x3 = -move+o
+y3 = -move/2+(move/2)
+z3 = -move/2+o
+
+x4 = -move/2+o
+y4 = -move+(move/2)
+z4 = -move/2+o
+
+for i in range(13):
+  x1 += move
+  y1 = 8.00-move
+  
+  x2 += move
+  y2 = -move/2+8.00
+  
+  x3 += move
+  y3 = -move/2+8.00
+  
+  x4 += move
+  y4 = 8.00-move
+
+  for j in range(5):
+    y1 += move
+    z1 = -move+o
+    
+    y2 += move
+    z2 = -move+o
+    
+    y3 += move
+    z3 = -move/2+o
+    
+    y4 += move
+    z4 = -move/2+o
+    for k in range(13):
+      z1 += move
+      z2 += move
+      z3 += move
+      z4 += move
+      
+      count += 1
+      
+      outString = str(x1) + " " + str(y1)+ " " + str(z1) + "\n"
+      f.write("H2O"+" "+str(count)+"\n")
+      f.write(outString)
+      
+      outString = str(x2) + " " + str(y2)+ " " + str(z2) + "\n"
+      f.write("H2O"+" "+str(count+1)+"\n")
+      f.write(outString)     
+
+      outString = str(x3) + " " + str(y3)+ " " + str(z3) + "\n"
+      f.write("H2O"+" "+str(count+2)+"\n")
+      f.write(outString)     
+
+      outString = str(x4) + " " + str(y4)+ " " + str(z4) + "\n"
+      f.write("H2O"+" "+str(count+3)+"\n")
+      f.write(outString)
+      count += 3
