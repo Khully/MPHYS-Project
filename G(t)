@@ -1,0 +1,160 @@
+from numpy import array, zeros, sqrt, savetxt, c_,log10
+from time import clock
+#import pylab as plt
+
+tStart = clock()
+lines = open('HISTORY','r').readlines()
+
+comp = str.split(lines[2])[0]  
+
+Npart = int(str.split(lines[1])[2])
+numtStep = int(str.split(lines[1])[3])
+bs = float(str.split(lines[3])[0])
+
+Nlines = (Npart*2)-1
+
+x = [[0 for a in range(Npart)] for b in range(numtStep)] 
+y = [[0 for a in range(Npart)] for b in range(numtStep)]
+z = [[0 for a in range(Npart)] for b in range(numtStep)]
+
+dx = [[0 for a in range(Npart)] for b in range(numtStep)]
+dy = [[0 for a in range(Npart)] for b in range(numtStep)]
+dz = [[0 for a in range(Npart)] for b in range(numtStep)]
+
+x = array(x,float)
+y = array(y,float)
+z = array(z,float)
+
+dx = array(dx,float)
+dy = array(dy,float)
+dz = array(dz,float)
+
+time = []
+ln = 0
+count = -1
+for i in range(len(lines)):
+    LSA = str.split(lines[i])    
+    if LSA[0] == comp:
+        time.append(float(str.split(lines[i])[6]))        
+        ln = i+5
+        count +=1
+        p = -1
+        for j in range(ln,ln+Nlines):
+            LSA = str.split(lines[j])
+            if len(LSA) == 3:
+                p +=1
+                x[count][p] = float(str.split(lines[j])[0])     
+                y[count][p] = float(str.split(lines[j])[1])
+                z[count][p] = float(str.split(lines[j])[2])
+
+for i in range(1,numtStep):
+    for j in range(Npart):
+
+        dx[i][j] = x[i][j]-x[i-1][j]
+        if dx[i][j] > bs/2.0:
+          if x[i][j] > 0 and x[i-1][j] < 0:
+            dx[i][j]= -(bs-dx[i][j])          
+          else:
+            dx[i][j]=bs-dx[i][j]
+
+        elif dx[i][j] < -bs/2.0:
+          dx[i][j] = bs+dx[i][j] 
+        
+        dy[i][j] = y[i][j]-y[i-1][j]
+        if dy[i][j] > bs/2.0:
+          if y[i][j] > 0 and y[i-1][j] < 0:
+            dy[i][j] = -(bs-dy[i][j])
+          else:
+            dy[i][j] = bs-dy[i][j]
+
+        elif dy[i][j] < -bs/2.0:
+          dy[i][j] = bs+dy[i][j]
+        
+        dz[i][j] = z[i][j]-z[i-1][j]
+        if dz[i][j] > bs/2.0:
+          if z[i][j] > 0 and z[i-1][j] < 0:
+            dz[i][j] = -(bs-dz[i][j]) 
+          else:
+            dz[i][j]=bs-dz[i][j]
+
+        elif dz[i][j] < -bs/2.0:
+          dz[i][j] = bs+dz[i][j]
+
+xCor = [[0 for a in range(Npart)] for b in range(numtStep)] 
+yCor = [[0 for a in range(Npart)] for b in range(numtStep)] 
+zCor = [[0 for a in range(Npart)] for b in range(numtStep)]
+
+xCor = array(xCor,float)
+yCor = array(yCor,float)
+zCor = array(zCor,float)
+
+
+for i in range(numtStep):
+   for j in range(Npart):
+     if i ==0:
+       xCor[i] = x[0]
+       yCor[i] = y[0]
+       zCor[i] = z[0]
+     else:
+       xCor[i][j] = dx[i][j]+xCor[i-1][j]
+       yCor[i][j] = dy[i][j]+yCor[i-1][j]
+       zCor[i][j] = dz[i][j]+zCor[i-1][j]
+
+ 
+Gt = zeros(numtStep)
+
+xR0 = [[0 for a in range(Npart)] for b in range(Npart-1)] 
+yR0 = [[0 for a in range(Npart)] for b in range(Npart-1)] 
+zR0 = [[0 for a in range(Npart)] for b in range(Npart-1)]
+xR0 = array(xR0,float)
+yR0 = array(yR0,float)
+zR0 = array(zR0,float)
+
+eqtn11 = 0
+
+for j in range(0,Npart-1):
+  for k in range(j+1,Npart):
+     xR0[j][k] = xCor[0][j]-xCor[0][k]
+     yR0[j][k] = yCor[0][j]-yCor[0][k]
+     zR0[j][k] = zCor[0][j]-zCor[0][k]
+
+     bot11 = ((xR0[j][k])**2+(yR0[j][k])**2+(zR0[j][k])**2)**3
+     eqtn11 += 1.0/bot11    
+Gt[0] = (eqtn11/Npart)
+ 
+eqtn11= 0
+tEnd = clock()
+print("Time before Fat loop",tEnd - tStart)
+
+tStart = clock()
+CosPsi = 0
+
+
+for i in range(1,numtStep):
+  for j in range(0,Npart-1):
+    for k in range(j+1,Npart):
+
+      xR = xCor[i][j] - xCor[i][k]
+      yR = yCor[i][j] - yCor[i][k]
+      zR = zCor[i][j] - zCor[i][k]
+
+      RR = (xR0[j][k]*xR)+(yR0[j][k]*yR)+(zR0[j][k]*zR)
+      CosPsi = RR/sqrt((xR0[j][k]**2+yR0[j][k]**2+zR0[j][k]**2)*(xR**2+yR**2+zR**2))
+    
+      top11 = 0.5*(3*(CosPsi**2)-1)
+      bot11 = (((xR0[j][k])**2+(yR0[j][k])**2+(zR0[j][k])**2)**(3/2))*(xR**2+yR**2+zR**2)**(3/2) 
+
+      if bot11<1:
+        print(i,j,k)
+        print(xCor[i][j],xCor[i][k],x[i][j],x[i][k])
+        print(yCor[i][j],yCor[i][k],y[i][j],y[i][k])
+        print(zCor[i][j],zCor[i][k],z[i][j],z[i][k])
+        print()
+
+      eqtn11 += top11/bot11
+  Gt[i] = eqtn11/(Npart)
+  eqtn11 = 0
+
+tEnd = clock()
+print("Time for fat loop:",tEnd - tStart)
+savetxt("Fay.dat",c_[time,Gt])
