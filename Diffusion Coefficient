@@ -1,14 +1,14 @@
-#importing the module used in the code
+#importing the module used in the code.
 import numpy as np
 import pylab as plt
 
-#reading in the lines from the simulation data file 
+#reading in the lines from the simulation data file.
 lines = open('HISTORYWater','r').readlines()
 
-#this is a comparison variable for the first **for** loop
+#this is a comparison variable for the first **for** loop.
 comp = str.split(lines[2])[0]  
 
-#defining variables taken from the data file
+#defining number of particles,number of timesteps,simulation cell size taken from the data file.
 Npart = int(str.split(lines[1])[2])
 numtStep = int(str.split(lines[1])[3])
 bs = float(str.split(lines[3])[0])
@@ -36,11 +36,11 @@ MSD = []
 ln = 0
 count = -1
 
-#the following loop is to only store the relevant information from the data file
-#This is the xyz coordinates of all the lqiuid particles at every timestep
-#the columns is the timestep counter
-#the rows are the coordinates
-#the coordinates are saved into three separate arrays
+#the following loop is to only store the relevant information from the data file.
+#This is the xyz coordinates of all the lqiuid particles at every timestep.
+#the columns is the timestep counter.
+#the rows are the coordinates for each particle.
+#the coordinates are saved into three separate arrays.
 for i in range(len(lines)):
     LSA = str.split(lines[i])    
     if LSA[0] == comp:
@@ -56,6 +56,8 @@ for i in range(len(lines)):
                 y[count][p] = float(str.split(lines[j])[1])
                 z[count][p] = float(str.split(lines[j])[2])
 
+#The simulation software uses periodic boundaries, so the *true* displacement for every particle is required
+#for the mean squared displacement.
 for i in range(numtStep):
     for j in range(Npart):
       if i == 0:
@@ -91,7 +93,8 @@ xCor = np.array(xCor,float)
 yCor = np.array(yCor,float)
 zCor = np.array(zCor,float)
 
-  
+#This **for** loop takes the xyz coordinates from the simulation data file and using the *true* displacements
+#the corrected coordinates can be used for the MSD calculation
 for i in range(numtStep):
    for j in range(Npart):
      if i ==0:
@@ -103,7 +106,7 @@ for i in range(numtStep):
        yCor[i][j] = dy[i][j]+yCor[i-1][j]
        zCor[i][j] = dz[i][j]+zCor[i-1][j]
 
-
+#The mean squared displacement 
 for j in range(numtStep):
   xSum = sum((xCor[j]-xCor[0])**2+(yCor[j]-yCor[0])**2+(zCor[j]-zCor[0])**2) 
   xSum = xSum/Npart
