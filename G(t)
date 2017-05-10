@@ -1,6 +1,5 @@
-from numpy import array, zeros, sqrt, savetxt, c_,log10
+from numpy import array, zeros, sqrt, savetxt, c_,sum,square
 from time import clock
-#import pylab as plt
 
 tStart = clock()
 lines = open('HISTORY','r').readlines()
@@ -101,60 +100,70 @@ for i in range(numtStep):
        zCor[i][j] = dz[i][j]+zCor[i-1][j]
 
  
-Gt = zeros(numtStep)
-
+Gt = [[0 for a in range(numtStep)] for b in range(numtStep)] 
 xR0 = [[0 for a in range(Npart)] for b in range(Npart-1)] 
 yR0 = [[0 for a in range(Npart)] for b in range(Npart-1)] 
 zR0 = [[0 for a in range(Npart)] for b in range(Npart-1)]
+xR02 = [[0 for a in range(Npart)] for b in range(Npart-1)] 
+yR02 = [[0 for a in range(Npart)] for b in range(Npart-1)] 
+zR02 = [[0 for a in range(Npart)] for b in range(Npart-1)]
 xR0 = array(xR0,float)
 yR0 = array(yR0,float)
 zR0 = array(zR0,float)
+xR02 = array(xR0,float)
+yR02 = array(yR0,float)
+zR02 = array(zR0,float)
+Gt = array(Gt,float)
 
-eqtn11 = 0
-
-for j in range(0,Npart-1):
-  for k in range(j+1,Npart):
-     xR0[j][k] = xCor[0][j]-xCor[0][k]
-     yR0[j][k] = yCor[0][j]-yCor[0][k]
-     zR0[j][k] = zCor[0][j]-zCor[0][k]
-
-     bot11 = ((xR0[j][k])**2+(yR0[j][k])**2+(zR0[j][k])**2)**3
-     eqtn11 += 1.0/bot11    
-Gt[0] = (eqtn11/Npart)
- 
-eqtn11= 0
 tEnd = clock()
 print("Time before Fat loop",tEnd - tStart)
 
 tStart = clock()
 CosPsi = 0
+count = -1
+eqtn11=0
 
-
-for i in range(1,numtStep):
+for t in range(numtStep):
   for j in range(0,Npart-1):
     for k in range(j+1,Npart):
+      xR0[j][k] = xCor[t][j]-xCor[t][k]
+      yR0[j][k] = yCor[t][j]-yCor[t][k]
+      zR0[j][k] = zCor[t][j]-zCor[t][k]
+  xR02 = square(xR0) 
+  yR02 = square(yR0)
+  zR02 = square(zR0)
+  for i in range(t,numtStep):
+    for j in range(0,Npart-1):
+      for k in range(j+1,Npart):
+        xR = xCor[i][j] - xCor[i][k]
+        yR = yCor[i][j] - yCor[i][k]
+        zR = zCor[i][j] - zCor[i][k]
 
-      xR = xCor[i][j] - xCor[i][k]
-      yR = yCor[i][j] - yCor[i][k]
-      zR = zCor[i][j] - zCor[i][k]
+        xR2 = xR**2
+        yR2 = yR**2
+        zR2 = zR**2
 
-      RR = (xR0[j][k]*xR)+(yR0[j][k]*yR)+(zR0[j][k]*zR)
-      CosPsi = RR/sqrt((xR0[j][k]**2+yR0[j][k]**2+zR0[j][k]**2)*(xR**2+yR**2+zR**2))
-    
-      top11 = 0.5*(3*(CosPsi**2)-1)
-      bot11 = (((xR0[j][k])**2+(yR0[j][k])**2+(zR0[j][k])**2)**(3/2))*(xR**2+yR**2+zR**2)**(3/2) 
+        R0 = xR02[j][k]+yR02[j][k]+zR02[j][k]
+        R = xR2+yR2+zR2
 
-      if bot11<1:
-        print(i,j,k)
-        print(xCor[i][j],xCor[i][k],x[i][j],x[i][k])
-        print(yCor[i][j],yCor[i][k],y[i][j],y[i][k])
-        print(zCor[i][j],zCor[i][k],z[i][j],z[i][k])
-        print()
+        RR = (xR0[j][k]*xR)+(yR0[j][k]*yR)+(zR0[j][k]*zR)
+        CosPsi = RR/sqrt(R0*R)
+      
+        top11 = 0.5*(3*(CosPsi**2)-1)
+        bot11 = ((R0)**(3/2))*((R)**(3/2)) 
 
-      eqtn11 += top11/bot11
-  Gt[i] = eqtn11/(Npart)
-  eqtn11 = 0
+        eqtn11 += top11/bot11
+    Gt[i-t][i] = eqtn11/(Npart)
+    eqtn11 = 0
+ 
+totGt = zeros(numtStep)
+tempGt=0
 
+for i in range(numtStep):
+    tempGt = sum(Gt[i])
+    totGt[i] = tempGt/(numtStep-i)
+      
 tEnd = clock()
 print("Time for fat loop:",tEnd - tStart)
-savetxt("Fay.dat",c_[time,Gt])
+
+savetxt("Fay.dat",c_[time,totGt])
